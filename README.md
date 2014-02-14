@@ -11,9 +11,7 @@ The CoronaView is instantiated just like any normal view.
 
 ## CoronaView contents (Lua)
 
-The contents of the `CoronaView` are determined via Lua. In this project, the `CoronaView` is told to look for Lua files in the `Corona` subfolder of the .app bundle. 
-
-NOTE: The Xcode project is setup to automatically copy the contents of `TabChildView/Corona` to a `Corona` subfolder in the destination .app bundle, so you are free to modify/add/delete the Lua files as well as other asset files.
+The contents of the `CoronaView` are determined via Lua. In this project, the `CoronaView` is told to look for Lua files in the `RagDoll` folder of the `assets` directory.
 
 
 # Setup
