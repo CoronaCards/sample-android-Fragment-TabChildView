@@ -24,25 +24,25 @@ public class CoronaFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.corona, container, false);
         mCoronaView = (CoronaView)v.findViewById(R.id.corona_view);
-        mCoronaView.setPath("RagDoll/");
+        mCoronaView.init("RagDoll/");
         return v;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mCoronaView.onResume();
+        mCoronaView.resume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mCoronaView.onPause();
+        mCoronaView.pause();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mCoronaView.onDestroy();
+        mCoronaView.destroy();
     }
 }
