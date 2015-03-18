@@ -1,1 +1,1 @@
-Place the .so files here.
+Place the .jar files here.
