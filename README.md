@@ -1,4 +1,4 @@
-sample-android-TabChildView
+sample-android-Fragment-TabChildView
 =======================
 
 This example shows you how to __embed__ a CoronaView into a fragment.  The fragment is then put into a tab.
