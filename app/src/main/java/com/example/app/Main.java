@@ -1,10 +1,16 @@
 package com.example.app;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +24,9 @@ import java.util.ArrayList;
  * flicks to move between the tabs.
  */
 public class Main extends FragmentActivity {
+
+    private final int READ_CONTACTS_REQUEST_CODE = 255;
+
     TabHost mTabHost;
     ViewPager  mViewPager;
     TabsAdapter mTabsAdapter;
@@ -36,8 +45,53 @@ public class Main extends FragmentActivity {
 
         mTabsAdapter.addTab(mTabHost.newTabSpec("Corona").setIndicator("Corona"),
                 CoronaFragment.class, null);
-        mTabsAdapter.addTab(mTabHost.newTabSpec("Native").setIndicator("Native"),
-                LoaderCursorSupport.CursorLoaderListFragment.class, null);
+
+        // Based on: http://developer.android.com/training/permissions/requesting.html#perm-request
+        // Check for the READ_CONTACTS permission before trying
+        // to make a CursorLoader with the contact list.
+        int readContactsPermissionState = ContextCompat.checkSelfPermission
+                (this, Manifest.permission.READ_CONTACTS);
+        if (readContactsPermissionState == PackageManager.PERMISSION_DENIED) {
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_CONTACTS)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                final FragmentActivity thisActivity = this;
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                DialogInterface.OnClickListener requestClickListener =
+                        new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int which) {
+                        // Request the READ_CONTACTS permission!
+                        ActivityCompat.requestPermissions(thisActivity,
+                                new String[]{Manifest.permission.READ_CONTACTS},
+                                READ_CONTACTS_REQUEST_CODE);
+                    }
+                };
+
+                // Compose the message for this alert.
+                builder.setTitle("Corona Cards Tabs Sample Needs Permission");
+                builder.setMessage("To make the native tab for this sample, access to the " +
+                        "device's Contacts is needed! Request access now?");
+                builder.setPositiveButton("Request", requestClickListener);
+                builder.setNegativeButton("Cancel", null);
+                AlertDialog readContactsRationaleDialog = builder.create();
+                readContactsRationaleDialog.setCanceledOnTouchOutside(false);
+                readContactsRationaleDialog.show();
+
+            } else {
+                // Request the READ_CONTACTS permission!
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_CONTACTS},
+                        READ_CONTACTS_REQUEST_CODE);
+            }
+        } else {
+            // We're safe to create the native tab.
+            createNativeTab();
+        }
 
         if (savedInstanceState != null) {
             mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
@@ -48,6 +102,38 @@ public class Main extends FragmentActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString("tab", mTabHost.getCurrentTabTag());
+    }
+
+    // Based on: http://developer.android.com/training/permissions/requesting.html#perm-request
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case READ_CONTACTS_REQUEST_CODE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    createNativeTab();
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
+    private void createNativeTab() {
+        mTabsAdapter.addTab(mTabHost.newTabSpec("Native").setIndicator("Native"),
+                LoaderCursorSupport.CursorLoaderListFragment.class, null);
     }
 
     /**
