@@ -2,19 +2,14 @@ package com.example.app;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.ansca.corona.CoronaView;
 
-/**
- * Created by dannychan on 2/14/14.
- */
 public class CoronaFragment extends Fragment {
-    int mNum;
-    CoronaView mCoronaView;
+    private CoronaView mCoronaView;
 
     /**
      * The Fragment's UI is just a simple text view showing its

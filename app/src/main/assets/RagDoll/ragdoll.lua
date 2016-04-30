@@ -2,8 +2,8 @@
 -- A port of the ragdoll from http://www.box2dflash.org/
 --
 -- Version: 1.0
--- 
--- Sample code is MIT licensed, see http://www.coronalabs.com/links/code/license
+--
+-- Sample code is MIT licensed, see https://www.coronalabs.com/links/code/license
 -- Copyright (C) 2010 Corona Labs Inc. All Rights Reserved.
 --
 -- History
@@ -18,9 +18,9 @@ local gameUI = require("gameUI")
 
 ragdoll.createWalls = function()
 	--> Create Walls
-	
+
 	local walls = display.newGroup()
-	
+
 	display.setDefault( "anchorX", 0.0 )	-- default to TopLeft anchor point for new objects
 	display.setDefault( "anchorY", 0.0 )
 
@@ -28,7 +28,7 @@ ragdoll.createWalls = function()
 	local rightWall = display.newRect (display.contentWidth, 0, 100, display.contentHeight)
 	local ceiling   = display.newRect (0, -100, display.contentWidth, 101)
 	local floor     = display.newRect (0, display.contentHeight, display.contentWidth, 100)
-	 
+
 	local b = 0.3 -- 0.0
 	local f = 0.1 -- 10
 
@@ -36,12 +36,12 @@ ragdoll.createWalls = function()
 	physics.addBody (rightWall, "static", {bounce = b, friction = f})
 	physics.addBody (ceiling, "static", {bounce = b, friction = f})
 	physics.addBody (floor, "static", {bounce = b, friction = f})
-	
+
 	walls:insert(leftWall)
 	walls:insert(rightWall)
 	walls:insert(ceiling)
 	walls:insert(floor)
-	
+
 	display.setDefault( "anchorX", 0.5 )	-- restore anchor points for new objects to center anchor point
 	display.setDefault( "anchorY", 0.5 )
 
@@ -58,17 +58,17 @@ local function TopLeft( object )
 	object.y = object.y + object.height *.5
 end
 
-function ragdoll.newRagDoll(originX, originY, colorTable) 
-       
+function ragdoll.newRagDoll(originX, originY, colorTable)
+
 	--> Create Ragdoll Group
-	 
+
 	-- display.setDefault( "anchorX", 0.0 )	-- default to TopLeft anchor point for new objects
 	-- display.setDefault( "anchorY", 0.0 )
 
 	local spacing = 1
-	 
+
 	local ragdoll = display.newGroup ()
-	 
+
 	local startX = originX+100
 	local startY = originY+50
 
@@ -78,7 +78,7 @@ function ragdoll.newRagDoll(originX, originY, colorTable)
 	var box:b2PolygonDef = new b2PolygonDef();
 	var jd:b2RevoluteJointDef = new b2RevoluteJointDef();
 	--]]
-	
+
 	-- Head
 	local head = display.newCircle( startX, startY, 12.5 )
 	setFill(head, colorTable)
@@ -179,7 +179,7 @@ function ragdoll.newRagDoll(originX, originY, colorTable)
 	upperArmR.CreateShape(box);
 	upperArmR.SetMassFromShapes();
 	--]]
-	
+
 	-- LowerArm
 	local w,h = 2*17,2*6
 
@@ -285,7 +285,7 @@ function ragdoll.newRagDoll(originX, originY, colorTable)
 local d=1
 local e=0.1
 local f=0.4
-	
+
 	physics.addBody (head, {bounce = 0.3, density=1.0, friction=0.4, radius = 12.5})
 	physics.addBody (torsoA, {bounce = e, density=d, friction = f})
 	physics.addBody (torsoB, {bounce = e, density=d, friction = f})
@@ -299,7 +299,7 @@ local f=0.4
 	physics.addBody (lowerLegL, {bounce = e, density=d, friction = f})
 	physics.addBody (lowerLegR, {bounce = e, density=d, friction = f})
 --]]
-	local function addFrictionJoint(a, b, posX, posY, lowerAngle, upperAngle, mT) 
+	local function addFrictionJoint(a, b, posX, posY, lowerAngle, upperAngle, mT)
 		local j = physics.newJoint ( "pivot", a, b, posX, posY, rFrom, rTo)
 		j.isLimitEnabled = true
 		j:setRotationLimits (lowerAngle, upperAngle)
@@ -308,7 +308,7 @@ local f=0.4
 
 	-- JOINTS
 	--jd.enableLimit = true;
-	
+
 	-- Head to shoulders
 	addFrictionJoint( torsoA, head, startX, (startY + 15), -40, 40 )
 	--[[
@@ -335,7 +335,7 @@ local f=0.4
 	jd.Initialize(torso1, upperArmR, new b2Vec2((startX + 18), (startY + 20)));
 	m_world.CreateJoint(jd);
 	--]]
-	
+
 	-- Lower arm to upper arm
 	-- L
 	addFrictionJoint( upperArmL, lowerArmL, (startX - 45), (startY + 20), -130, 10 )
@@ -354,7 +354,7 @@ local f=0.4
 	jd.Initialize(upperArmR, lowerArmR, new b2Vec2((startX + 45), (startY + 20)));
 	m_world.CreateJoint(jd);
 	--]]
-	
+
 	-- Shoulders/stomach
 	local j = addFrictionJoint( torsoA, torsoB, (startX), (startY + 35), -15, 15 )
 --	Runtime:addEventListener( "enterFrame", function()
@@ -374,7 +374,7 @@ local f=0.4
 	jd.Initialize(torso2, torso3, new b2Vec2(startX, (startY + 50)));
 	m_world.CreateJoint(jd);
 	--]]
-	
+
 	-- Torso to upper leg
 	-- L
 	addFrictionJoint( torsoC, upperLegL, (startX - 8), (startY + 72), -25, 45 )
@@ -412,7 +412,7 @@ local f=0.4
 	jd.Initialize(upperLegR, lowerLegR, new b2Vec2((startX + 8), (startY + 105)));
 	m_world.CreateJoint(jd);
 	--]]
-	
+
 	--[[
 	// Add stairs on the left
 	for (var j:int = 1; j <= 10; j++){
@@ -426,7 +426,7 @@ local f=0.4
 		head.CreateShape(box);
 		head.SetMassFromShapes();
 	}
-	
+
 	// Add stairs on the right
 	for (var k:int = 1; k <= 10; k++){
 		box.SetAsBox((10*k), 10);
@@ -439,7 +439,7 @@ local f=0.4
 		head.CreateShape(box);
 		head.SetMassFromShapes();
 	}
-	
+
 	box.SetAsBox(30, 40);
 	box.density = 0.0;
 	box.friction = 0.4;
@@ -454,7 +454,7 @@ local f=0.4
 	function ragdoll:touch( event )
 		gameUI.dragBody( event )
 	end
-	 
+
 	head:addEventListener ( "touch", ragdoll )
 	upperLegL:addEventListener ( "touch", ragdoll )
 	upperLegR:addEventListener ( "touch", ragdoll )

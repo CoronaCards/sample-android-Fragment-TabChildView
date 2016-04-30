@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -23,28 +24,27 @@ import java.util.ArrayList;
  * that switches between tabs and also allows the user to perform horizontal
  * flicks to move between the tabs.
  */
-public class Main extends FragmentActivity {
+public class MainActivity extends FragmentActivity {
 
     private final int READ_CONTACTS_REQUEST_CODE = 255;
 
-    TabHost mTabHost;
-    ViewPager  mViewPager;
-    TabsAdapter mTabsAdapter;
+    private TabHost mTabHost;
+    private TabsAdapter mTabsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.fragment_tabs_pager);
-        mTabHost = (TabHost)findViewById(android.R.id.tabhost);
+        mTabHost = (TabHost) findViewById(android.R.id.tabhost);
         mTabHost.setup();
 
-        mViewPager = (ViewPager)findViewById(R.id.pager);
+        ViewPager mViewPager = (ViewPager) findViewById(R.id.pager);
 
         mTabsAdapter = new TabsAdapter(this, mTabHost, mViewPager);
 
         mTabsAdapter.addTab(mTabHost.newTabSpec("Corona").setIndicator("Corona"),
-                CoronaFragment.class, null);
+                CoronaFragment.class);
 
         // Based on: http://developer.android.com/training/permissions/requesting.html#perm-request
         // Check for the READ_CONTACTS permission before trying
@@ -63,21 +63,21 @@ public class Main extends FragmentActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 DialogInterface.OnClickListener requestClickListener =
                         new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface arg0, int which) {
-                        // Request the READ_CONTACTS permission!
-                        ActivityCompat.requestPermissions(thisActivity,
-                                new String[]{Manifest.permission.READ_CONTACTS},
-                                READ_CONTACTS_REQUEST_CODE);
-                    }
-                };
+                            @Override
+                            public void onClick(DialogInterface arg0, int which) {
+                                // Request the READ_CONTACTS permission!
+                                ActivityCompat.requestPermissions(thisActivity,
+                                        new String[]{Manifest.permission.READ_CONTACTS},
+                                        READ_CONTACTS_REQUEST_CODE);
+                            }
+                        };
 
                 // Compose the message for this alert.
                 builder.setTitle("Corona Cards Tabs Sample Needs Permission");
                 builder.setMessage("To make the native tab for this sample, access to the " +
                         "device's Contacts is needed! Request access now?");
                 builder.setPositiveButton("Request", requestClickListener);
-                builder.setNegativeButton("Cancel", null);
+                builder.setNegativeButton(android.R.string.cancel, null);
                 AlertDialog readContactsRationaleDialog = builder.create();
                 readContactsRationaleDialog.setCanceledOnTouchOutside(false);
                 readContactsRationaleDialog.show();
@@ -107,10 +107,11 @@ public class Main extends FragmentActivity {
     // Based on: http://developer.android.com/training/permissions/requesting.html#perm-request
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
             case READ_CONTACTS_REQUEST_CODE: {
                 // If request is cancelled, the result arrays are empty.
+                //noinspection StatementWithEmptyBody
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
@@ -123,6 +124,7 @@ public class Main extends FragmentActivity {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }
+                //noinspection UnnecessaryReturnStatement
                 return;
             }
 
@@ -133,7 +135,7 @@ public class Main extends FragmentActivity {
 
     private void createNativeTab() {
         mTabsAdapter.addTab(mTabHost.newTabSpec("Native").setIndicator("Native"),
-                LoaderCursorSupport.CursorLoaderListFragment.class, null);
+                LoaderCursorSupport.CursorLoaderListFragment.class);
     }
 
     /**
@@ -152,17 +154,15 @@ public class Main extends FragmentActivity {
         private final Context mContext;
         private final TabHost mTabHost;
         private final ViewPager mViewPager;
-        private final ArrayList<TabInfo> mTabs = new ArrayList<TabInfo>();
+        private final ArrayList<TabInfo> mTabs = new ArrayList<>();
 
         static final class TabInfo {
-            private final String tag;
             private final Class<?> clss;
             private final Bundle args;
 
-            TabInfo(String _tag, Class<?> _class, Bundle _args) {
-                tag = _tag;
+            TabInfo(Class<?> _class) {
                 clss = _class;
-                args = _args;
+                args = null;
             }
         }
 
@@ -189,14 +189,13 @@ public class Main extends FragmentActivity {
             mViewPager = pager;
             mTabHost.setOnTabChangedListener(this);
             mViewPager.setAdapter(this);
-            mViewPager.setOnPageChangeListener(this);
+            mViewPager.addOnPageChangeListener(this);
         }
 
-        public void addTab(TabHost.TabSpec tabSpec, Class<?> clss, Bundle args) {
+        public void addTab(TabHost.TabSpec tabSpec, Class<?> clss) {
             tabSpec.setContent(new DummyTabFactory(mContext));
-            String tag = tabSpec.getTag();
 
-            TabInfo info = new TabInfo(tag, clss, args);
+            TabInfo info = new TabInfo(clss);
             mTabs.add(info);
             mTabHost.addTab(tabSpec);
             notifyDataSetChanged();

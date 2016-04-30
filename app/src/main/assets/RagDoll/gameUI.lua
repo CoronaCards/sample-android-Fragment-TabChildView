@@ -6,6 +6,7 @@ module(..., package.seeall)
 -- Simple example:
 -- 		local dragBody = gameUI.dragBody
 -- 		object:addEventListener( "touch", dragBody )
+local total_number_of_joints_created = 0
 
 function dragBody( event, params )
 	local body = event.target
@@ -13,6 +14,15 @@ function dragBody( event, params )
 	local stage = display.getCurrentStage()
 
 	if "began" == phase then
+
+		if total_number_of_joints_created > 0 then
+			-- Nothing to do.
+			--
+			-- This event happens for ALL bodies, therefore, we have to limit
+			-- the total number of joints we create to avoid strange behaviors.
+			return
+		end
+
 		stage:setFocus( body, event.id )
 		body.isFocus = true
 
@@ -25,6 +35,8 @@ function dragBody( event, params )
 			body.tempJoint = physics.newJoint( "touch", body, event.x, event.y )
 		end
 
+		total_number_of_joints_created = total_number_of_joints_created + 1
+
 --		body.tempJoint.maxForce = 0.25*body.tempJoint.maxForce
 
 		-- Apply optional joint parameters
@@ -35,31 +47,32 @@ function dragBody( event, params )
 				-- Internal default is (1000 * mass), so set this fairly high if setting manually
 				body.tempJoint.maxForce = params.maxForce
 			end
-			
+
 			if params.frequency then
 				-- This is the response speed of the elastic joint: higher numbers = less lag/bounce
 				body.tempJoint.frequency = params.frequency
 			end
-			
+
 			if params.dampingRatio then
 				-- Possible values: 0 (no damping) to 1.0 (critical damping)
 				body.tempJoint.dampingRatio = params.dampingRatio
 			end
 		end
-	
+
 	elseif body.isFocus then
 		if "moved" == phase then
-		
+
 			-- Update the joint to track the touch
 			body.tempJoint:setTarget( event.x, event.y )
 
 		elseif "ended" == phase or "cancelled" == phase then
 			stage:setFocus( body, nil )
 			body.isFocus = false
-			
-			-- Remove the joint when the touch ends			
+
+			-- Remove the joint when the touch ends
 			body.tempJoint:removeSelf()
-			
+
+			total_number_of_joints_created = total_number_of_joints_created - 1
 		end
 	end
 
@@ -78,7 +91,7 @@ function newEventSoundXP( params )
 	elseif params.ios then
 		soundID = media.newEventSound( params.ios ) -- return sound file for iOS/MacOS
 	end
-	
+
 	return soundID
 end
 
@@ -95,6 +108,6 @@ function newFontXP( params )
 	else
 		font = native.systemFont -- default font (Helvetica on iOS, Android Sans on Android)
 	end
-	
+
 	return font
 end
